@@ -1,0 +1,264 @@
+openapi: 3.0.0
+info:
+  title: BananaShare API
+  description: API de transfert de fichiers local, temporaire ou permanent, auto-hébergé sur NAS.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+    description: Serveur local
+
+tags:
+  - name: Upload
+    description: Envoi de fichiers
+  - name: Téléchargement
+    description: Accès via lien court
+  - name: Administration
+    description: Listing et suppression
+  - name: Système
+    description: Endpoint de vérification & authentification
+  - name: Maintenance
+    description: Nettoyage, purge et fichiers expirés
+
+paths:
+  /auth/token:
+    post:
+      tags:
+        - Système
+      summary: Génère un token JWT (OAuth2 password)
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                grant_type:
+                  type: string
+                  default: password
+      responses:
+        200:
+          description: Token JWT renvoyé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  token_type:
+                    type: string
+                    example: bearer
+                  expires_in:
+                    type: integer
+                    example: 3600
+        400:
+          description: Paramètres manquants
+        401:
+          description: Identifiants invalides
+
+  /api/upload:
+    post:
+      tags:
+        - Upload
+      summary: Upload d'un fichier
+      security:
+        - OAuth2:
+            - user
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Upload réussi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponse'
+        400:
+          description: Fichier invalide ou manquant
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: 'Fichier manquant ou mal formé'
+
+  /api/files/{id}:
+    get:
+      tags:
+        - Téléchargement
+      summary: Télécharger un fichier via son ID
+      security:
+        - OAuth2:
+            - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Fichier retourné
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        404:
+          description: Fichier introuvable
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: 'Fichier non trouvé'
+
+    delete:
+      tags:
+        - Administration
+      summary: Supprimer un fichier par son ID
+      security:
+        - OAuth2:
+            - admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Fichier supprimé
+        401:
+          description: Authentification requise
+        404:
+          description: Aucun fichier correspondant
+
+  /api/files:
+    get:
+      tags:
+        - Administration
+      summary: Liste tous les fichiers enregistrés
+      security:
+        - OAuth2:
+            - admin
+      responses:
+        200:
+          description: Liste des fichiers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/File'
+        401:
+          description: Accès refusé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: 'Authentification requise'
+
+  /api/status:
+    get:
+      tags:
+        - Système
+      summary: Vérifie si l'API est vivante
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /api/expired:
+    get:
+      tags:
+        - Maintenance
+      summary: Liste les fichiers expirés automatiquement
+      security:
+        - OAuth2:
+            - admin
+      responses:
+        200:
+          description: Liste retournée
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/File'
+        401:
+          description: Authentification requise
+        403:
+          description: Accès non autorisé
+
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: /auth/token
+          scopes:
+            user: Accès utilisateur
+            admin: Accès administrateur
+
+  schemas:
+    UploadResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        fileId:
+          type: string
+          example: abc123xyz
+
+    File:
+      type: object
+      properties:
+        filename:
+          type: string
+          example: document.pdf
+        size:
+          type: integer
+          example: 5242880
+        uploadedAt:
+          type: string
+          format: date-time
+          example: '2025-05-14T12:00:00Z'
