@@ -11,7 +11,7 @@ Backend du projet **BananaShare**, un service de transfert de fichiers local, in
 
 ## 📁 Arborescence
 
-```
+```text
 Backend-BananaShare/
 │
 ├── src/
