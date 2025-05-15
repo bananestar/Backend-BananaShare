@@ -1,0 +1,33 @@
+{
+  "name": "bananashare_backend",
+  "version": "1.0.0",
+  "description": "Backend du projet **BananaShare**, un service de transfert de fichiers local, inspiré de WeTransfer, développé pour être hébergé sur un NAS avec gestion temporaire et permanente des fichiers.",
+  "main": "src/app.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bananestar/Backend-BananaShare.git"
+  },
+  "author": "bananestar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bananestar/Backend-BananaShare/issues"
+  },
+  "homepage": "https://github.com/bananestar/Backend-BananaShare#readme",
+  "dependencies": {
+    "axios": "^1.9.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "multer": "^1.4.5-lts.2",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
