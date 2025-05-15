@@ -48,9 +48,26 @@ npm run dev
 ## 🔐 Exemple de fichier .env
 
 ```env
+# Configuration du serveur
 PORT=3000
-UPLOAD_DIR=./uploads
 BASE_URL=http://localhost:3000
+
+# Base de données PostgreSQL
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
+DB_URL=
+
+# Répertoire de stockage temporaire
+UPLOAD_DIR=./uploads
+
+# JWT
+JWT_SECRET=unBonGrosSecretBienRandom123!
+
+# Durée de vie des fichiers (en jours)
+FILE_TTL_DAYS=30
 ```
 
 ## 📡 Endpoints de base
