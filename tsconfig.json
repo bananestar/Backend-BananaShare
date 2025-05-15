@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // Bon compromis perfs/fonctionnalités
+    "module": "CommonJS", // Pour Node.js
+    "rootDir": "src", // Source TypeScript
+    "outDir": "dist", // Build JS
+    "strict": true, // Active tous les checks types (fortement recommandé)
+    "esModuleInterop": true, // Pour import express/cors etc.
+    "forceConsistentCasingInFileNames": true, // Cas cohérent
+    "skipLibCheck": true, // Accélère un peu la compilation
+    "resolveJsonModule": true, // Si tu veux importer des fichiers JSON
+    "moduleResolution": "node", // Résolution façon Node
+    "allowSyntheticDefaultImports": true, // Permet les imports "import x from y"
+    "types": ["node", "express"], // Auto-complétion propre
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "baseUrl": "./src",
+    "paths": {
+      "*": ["*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
